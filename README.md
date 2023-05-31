@@ -1,6 +1,7 @@
 # Partition_2023
 a collection of Partition, Score, sheet music 
 
+````
 #!/bin/bash
 
 # The script starts with shebang, which specifies the interpreter (Bash) to be used for executing the script.
@@ -170,3 +171,4 @@ fi
 #After processing each photo, the script removes the processed photo name from the list of photo names obtained earlier.
 # Once it is done, the script checks if the list of the photo names is not empty. If it is is not empty, it is time for the deleting process.
 # Finally, the script performs a logout and an exit message to notify the user that tha script is done.
+````
