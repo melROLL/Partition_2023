@@ -8,6 +8,7 @@ a collection of Partition, Score, sheet music
 
 # Melvyn ROLLAND 30/05/2023
 
+#if the script is not executable do chmod + x TP3_PIPELINE
 # The script utilizes an API to upload photos from a folder to an online photo server. An API (Application Programming Interface) is protocols that makes software applications to communicate and interact with each other.
 # update: it removes any photos from the server that are no longer present in the folder.
 
@@ -27,8 +28,15 @@ password="we4reDATA" #this is the goodpassword
 altpassword="mel"
 token="dlJXibPCipj5TzIcFu_6Zg=="
 
+#Prerequisites :
+# sudo apt update
+# sudo apt install curl jq libimage-exiftool-perl
+# sudo apt upgrade 
+
+
 # Check if the folder is properly mounted
-if mount | grep /home/datasource > /dev/null; then
+# if mount | grep /datasource > /dev/null; then #local path
+if mount | grep /home/mrolland/datasource > /dev/null; then #relative path
     echo "The shared folder is properly mounted."
 
     # Connecting to the server.
@@ -54,7 +62,7 @@ if mount | grep /home/datasource > /dev/null; then
 
     echo "Processing in progress..."
     # For each file with the .jpg extension in the shared folder.
-    for photo_fold in /home/datasource/*.jpg ; do
+    for photo_fold in /home/mrolland/datasource/*.jpg ; do
         # Clean the photo name.
         photo_fold_flt="$(echo ${photo_fold##*/} | cut -d'.' -f 1)"
 
@@ -70,18 +78,18 @@ if mount | grep /home/datasource > /dev/null; then
         # If the photo has not been found.
         if ! ((photo_in_alb)) ; then
             # Extract the metadata.
-            metadata=$(exiftool -j "/home/datasource/$photo_fold_flt.jpg")
+            metadata=$(exiftool -j "/home/mrolland/datasource/$photo_fold_flt.jpg")
 
             # Add the photo to the album and get its ID.
             id_photo_add=$(curl -X POST -H "Authorization: $token" \
             -H 'Content-Type: multipart/form-data' -H 'Accept: application/json' \
             -F "albumID=$id_album" \
-            -F "file=@/home/datasource/$photo_fold_flt.jpg" \
+            -F "file=@/home/mrolland/datasource/$photo_fold_flt.jpg" \
             https://photoserver.mde.epf.fr/api/Photo::add | jq ".id")
 
             # Launch the program to get the associated color.
-            color=$(/home/datasource/getColor.py \
-            /home/datasource/$photo_fold_flt.jpg)
+            color=$(/home/mrolland/datasource/getColor.py \
+            /home/mrolland/datasource/$photo_fold_flt.jpg)
             # Replace the comma with the tag structure.
             color_flt=$(echo "$color" | sed 's/,/", "/g' | sed 's/^/"/;s/$/"/')
 
@@ -154,7 +162,7 @@ fi
 # Detailed explaination on how this script works 
 
 #The script sets some variables for authentication purposes: user, password, altpassword, and token. These variables contain the necessary credentials to access the API.
-#The script checks if "/home/datasource" is properly mounted. It uses the mount command and checks if the folder is present in the output.
+#The script checks if "/home/mrolland/datasource" is properly mounted. It uses the mount command and checks if the folder is present in the output.
 #If the folder is properly mounted, the script connect to the server. It uses the curl command to send a request to the server
 #After successfull logging in, the script gets the ID of the album associated with the token. It sends another POST request to the server's albums endpoint, retrieves the response using jq (a tool for processing JSON data), and extracts the ID from the response.
 #The script retrieves the names of the photos already present in the album. It sends a POST request to the lychee server
